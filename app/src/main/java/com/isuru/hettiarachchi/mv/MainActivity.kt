@@ -1,6 +1,10 @@
 package com.isuru.hettiarachchi.mv
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -13,6 +17,8 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: SearchView
+    private lateinit var downloadButton:Button
+    private lateinit var noInternetView: View
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +44,19 @@ class MainActivity : ComponentActivity() {
             }
         })
 
+        noInternetView = layoutInflater.inflate(R.layout.no_internet, recyclerView.parent as ViewGroup, false)
+        val retryButton = noInternetView.findViewById<Button>(R.id.retryButton)
+        retryButton.setOnClickListener {
+            observeMovies()
+        }
+
         observeMovies()
+
+        downloadButton = findViewById(R.id.downloadButton)
+        downloadButton.setOnClickListener{
+            val intent = Intent(this,DownloadActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun observeMovies() {
@@ -46,8 +64,12 @@ class MainActivity : ComponentActivity() {
             // Observe the movies LiveData from ViewModel
             movieViewModel.movies.observe(this) { movies ->
                 recyclerView.adapter = MovieAdapter(movies ?: listOf(),this)
+                recyclerView.visibility = View.VISIBLE
+                noInternetView.visibility = View.GONE
             }
         } else {
+            recyclerView.visibility = View.GONE
+            noInternetView.visibility = View.VISIBLE
             Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG).show()
         }
     }
@@ -59,6 +81,8 @@ class MainActivity : ComponentActivity() {
                 recyclerView.adapter = MovieAdapter(movies ?: listOf(),this)
             }
         } else {
+            recyclerView.visibility = View.GONE
+            noInternetView.visibility = View.VISIBLE
             Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG).show()
         }
     }

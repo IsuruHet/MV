@@ -11,6 +11,16 @@
         android:layout_height="wrap_content"
         android:queryHint="Search for movies" />
 
+    <Button
+        android:id="@+id/downloadButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_purple"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:text="@string/download"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

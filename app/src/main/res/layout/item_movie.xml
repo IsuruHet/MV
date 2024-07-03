@@ -64,6 +64,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_720p"
+            android:background="@drawable/gradient_green"
+            android:layout_marginRight="10dp"
             android:visibility="gone"/>
 
         <Button
@@ -71,12 +73,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_1080p"
+            android:background="@drawable/gradient_green"
+            android:layout_marginRight="10dp"
             android:visibility="gone"/>
         <Button
             android:id="@+id/movie_torrent_2160p"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_2160p"
+            android:background="@drawable/gradient_green"
             android:visibility="gone"/>
 
     </LinearLayout>

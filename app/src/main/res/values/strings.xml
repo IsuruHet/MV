@@ -3,4 +3,5 @@
     <string name="_720p">720p</string>
     <string name="_1080p">1080p</string>
     <string name="_2160p">2160p</string>
+    <string name="download">Download</string>
 </resources>

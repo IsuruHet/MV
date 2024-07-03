@@ -16,6 +16,15 @@ data class MovieData(
 data class Movie(
     val id:Int,
     val title:String,
+    val year:Int,
+    val runtime:Int,
+    val genres:List<String>,
     val summary:String,
-    val medium_cover_image:String
+    val medium_cover_image:String,
+    val torrents:List<Torrent>
+)
+
+data class Torrent(
+    val hash:String,
+    val quality:String
 )

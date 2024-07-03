@@ -11,4 +11,10 @@ interface MovieApiService {
         @Query("page") page: Int
     ): Call<MovieResponse>
 
+    @GET("list_movies.json")
+    fun searchMovies(
+        @Query("limit")limit:Int = 20,
+        @Query("query_term")query: String?=null
+    ):Call<MovieResponse>
+
 }

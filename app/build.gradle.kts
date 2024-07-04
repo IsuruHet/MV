@@ -53,7 +53,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
 
-
+    implementation("com.google.android.material:material:1.13.0-alpha03")
 
     //Retrofit for networking
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")

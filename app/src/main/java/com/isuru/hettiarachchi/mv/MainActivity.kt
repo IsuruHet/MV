@@ -1,10 +1,12 @@
 package com.isuru.hettiarachchi.mv
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.activity.ComponentActivity
@@ -24,20 +26,32 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Load theme preference and set theme
+        if (loadThemePreference()) {
+            setTheme(R.style.DarkTheme_MV)
+        } else {
+            setTheme(R.style.AppTheme)
+        }
+
+
+
         setContentView(R.layout.activity_main)
 
         //Dark Mode
 
         toggleButton = findViewById(R.id.toggleButton)
 
+        // Set the toggle button's state based on the current theme
+        toggleButton.isChecked = loadThemePreference()
 
         toggleButton.setOnCheckedChangeListener{ _,isChecked->
-            if (isChecked){
-                setTheme(R.style.AppTheme)
-            }else{
-                setTheme(R.style.DarkTheme)
-            }
+            toggleButton.isChecked = loadThemePreference()
 
+            toggleButton.setOnCheckedChangeListener { _, isChecked ->
+                saveThemePreference(isChecked)
+                restartActivity()
+            }
         }
 
         recyclerView = findViewById(R.id.recyclerView)
@@ -73,6 +87,24 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(this, DownloadActivity::class.java)
             startActivity(intent)
         }
+    }
+
+
+    private fun loadThemePreference(): Boolean {
+        val sharedPreferences = getSharedPreferences("ThemePrefs", MODE_PRIVATE)
+        return sharedPreferences.getBoolean("isDarkTheme", false) // default to light theme
+    }
+
+    private fun saveThemePreference(isDarkTheme: Boolean) {
+        val sharedPreferences = getSharedPreferences("ThemePrefs", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("isDarkTheme", isDarkTheme)
+        editor.apply()
+    }
+
+    private fun restartActivity() {
+        finish()
+        startActivity(intent)
     }
 
     private fun observeMovies() {

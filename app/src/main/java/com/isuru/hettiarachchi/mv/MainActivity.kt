@@ -1,12 +1,13 @@
 package com.isuru.hettiarachchi.mv
 
-import android.content.Context
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.activity.ComponentActivity
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var downloadButton: Button
     private lateinit var noInternetView: LinearLayout
     private lateinit var toggleButton:ToggleButton
+    private lateinit var infoButton:Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +35,6 @@ class MainActivity : ComponentActivity() {
         } else {
             setTheme(R.style.AppTheme)
         }
-
-
 
         setContentView(R.layout.activity_main)
 
@@ -58,6 +58,17 @@ class MainActivity : ComponentActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         noInternetView = findViewById(R.id.noInternetView)
+
+        //Info
+
+        infoButton = findViewById(R.id.infoButton)
+        infoButton.setOnClickListener{
+            showInfoDialog()
+        }
+
+
+
+
 
         searchView = findViewById(R.id.searchView)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -87,6 +98,15 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(this, DownloadActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun showInfoDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogLayout = layoutInflater.inflate(R.layout.dialog_info,null)
+
+        builder.setView(dialogLayout)
+        builder.setPositiveButton("OK",null)
+        builder.show()
     }
 
 

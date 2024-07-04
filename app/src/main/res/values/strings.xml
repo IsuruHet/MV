@@ -9,4 +9,7 @@
     <string name="info_icon">Info Icon</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
+    <string name="developer_info_isuru_hettiarachchi">Developer Info: Isuru Hettiarachchi</string>
+    <string name="version_1_0">Version 1.0</string>
+    <string name="developer_image">Developer Image</string>
 </resources>

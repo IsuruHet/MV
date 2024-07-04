@@ -3,12 +3,13 @@ package com.isuru.hettiarachchi.mv
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import androidx.appcompat.widget.SearchView
+import android.widget.LinearLayout
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -17,16 +18,32 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: SearchView
-    private lateinit var downloadButton:Button
-    private lateinit var noInternetView: View
-
+    private lateinit var downloadButton: Button
+    private lateinit var noInternetView: LinearLayout
+    private lateinit var toggleButton:ToggleButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //Dark Mode
+
+        toggleButton = findViewById(R.id.toggleButton)
+
+
+        toggleButton.setOnCheckedChangeListener{ _,isChecked->
+            if (isChecked){
+                setTheme(R.style.AppTheme)
+            }else{
+                setTheme(R.style.DarkTheme)
+            }
+
+        }
+
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        noInternetView = findViewById(R.id.noInternetView)
 
         searchView = findViewById(R.id.searchView)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -44,7 +61,6 @@ class MainActivity : ComponentActivity() {
             }
         })
 
-        noInternetView = layoutInflater.inflate(R.layout.no_internet, recyclerView.parent as ViewGroup, false)
         val retryButton = noInternetView.findViewById<Button>(R.id.retryButton)
         retryButton.setOnClickListener {
             observeMovies()
@@ -53,8 +69,8 @@ class MainActivity : ComponentActivity() {
         observeMovies()
 
         downloadButton = findViewById(R.id.downloadButton)
-        downloadButton.setOnClickListener{
-            val intent = Intent(this,DownloadActivity::class.java)
+        downloadButton.setOnClickListener {
+            val intent = Intent(this, DownloadActivity::class.java)
             startActivity(intent)
         }
     }
@@ -63,7 +79,7 @@ class MainActivity : ComponentActivity() {
         if (NetworkUtils.isNetworkAvailable(this)) {
             // Observe the movies LiveData from ViewModel
             movieViewModel.movies.observe(this) { movies ->
-                recyclerView.adapter = MovieAdapter(movies ?: listOf(),this)
+                recyclerView.adapter = MovieAdapter(movies ?: listOf(), this)
                 recyclerView.visibility = View.VISIBLE
                 noInternetView.visibility = View.GONE
             }
@@ -78,7 +94,7 @@ class MainActivity : ComponentActivity() {
         if (NetworkUtils.isNetworkAvailable(this)) {
             // Observe the searchMovies LiveData from ViewModel
             movieViewModel.searchMovies(query).observe(this) { movies ->
-                recyclerView.adapter = MovieAdapter(movies ?: listOf(),this)
+                recyclerView.adapter = MovieAdapter(movies ?: listOf(), this)
             }
         } else {
             recyclerView.visibility = View.GONE
@@ -87,3 +103,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+

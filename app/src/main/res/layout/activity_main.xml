@@ -11,19 +11,53 @@
         android:layout_height="wrap_content"
         android:queryHint="Search for movies" />
 
-    <Button
-        android:id="@+id/downloadButton"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_purple"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:text="@string/download"
-        />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/infoButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/info_button"
+            android:contentDescription="@string/info_icon" />
+
+        <Button
+            android:id="@+id/downloadButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/round_button"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/download"
+            android:layout_marginEnd="8dp"
+            />
+
+        <ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/light"
+            android:textOff="@string/dark"
+            android:checked="false"/>
+
+
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/item_movie" />
+    <include
+        android:id="@+id/noInternetView"
+        layout="@layout/no_internet"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </LinearLayout>

@@ -8,13 +8,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.appcompat.app.AppCompatActivity
-import java.io.File
+import androidx.activity.ComponentActivity
 
-class DownloadActivity : AppCompatActivity() {
+
+class DownloadActivity : ComponentActivity() {
 
     private var downloadId: Long = 0
     private lateinit var downloadManager: DownloadManager

@@ -1,31 +1,44 @@
 package com.isuru.hettiarachchi.mv
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.Context
-import android.database.Cursor
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
 
 class DownloadActivity : ComponentActivity() {
 
-    private var downloadId: Long = 0
-    private lateinit var downloadManager: DownloadManager
+    private lateinit var webView: WebView
+    private val PERMISSION_REQUEST_CODE = 1
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        scheduleClearCacheWorker()
+
+
         setContentView(R.layout.download_movie)
 
-        downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        checkPermissions()
 
-        val webView: WebView = findViewById(R.id.webView)
+
+        webView = findViewById(R.id.webView)
         webView.webViewClient = WebViewClient()
         webView.webChromeClient = WebChromeClient()
         webView.settings.javaScriptEnabled = true
@@ -36,54 +49,54 @@ class DownloadActivity : ComponentActivity() {
         webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             val request = DownloadManager.Request(Uri.parse(url))
             request.setMimeType(mimetype)
+            val cookies = android.webkit.CookieManager.getInstance().getCookie(url)
+            request.addRequestHeader("cookie", cookies)
             request.addRequestHeader("User-Agent", userAgent)
             request.setDescription("Downloading file...")
-            request.setTitle(getFileName(contentDisposition))
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, getFileName(contentDisposition))
+            request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            request.setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                URLUtil.guessFileName(url, contentDisposition, mimetype)
+            )
 
-            downloadId = downloadManager.enqueue(request)
+            val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
+
+            Toast.makeText(applicationContext, "Downloading File...", Toast.LENGTH_LONG).show()
+
+
         }
     }
 
-    private fun getFileName(contentDisposition: String?): String {
-        var fileName = "unknown"
-        if (contentDisposition != null) {
-            val split = contentDisposition.split("filename=")
-            if (split.size == 2) {
-                fileName = split[1].replace("\"", "")
-            }
+
+
+
+
+
+    private fun checkPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                PERMISSION_REQUEST_CODE
+            )
         }
-        return fileName
     }
 
-    // Method to pause the download
-    private fun pauseDownload() {
-        downloadManager.remove(downloadId)
+    private fun scheduleClearCacheWorker() {
+        val clearCacheWorkRequest = PeriodicWorkRequestBuilder<ClearCacheWorker>(7, TimeUnit.DAYS)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "ClearCacheWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            clearCacheWorkRequest
+        )
     }
 
-    // Method to resume the download
-    private fun resumeDownload(url: String, fileName: String, downloadedBytes: Long) {
-        val request = DownloadManager.Request(Uri.parse(url))
-        request.setDescription("Resuming download...")
-        request.setTitle(fileName)
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-        request.addRequestHeader("Range", "bytes=$downloadedBytes-")
-        downloadId = downloadManager.enqueue(request)
-    }
-
-    // Method to get the current downloaded bytes
-    private fun getDownloadedBytes(downloadId: Long): Long {
-        val query = DownloadManager.Query()
-        query.setFilterById(downloadId)
-        val cursor: Cursor = downloadManager.query(query)
-        var downloadedBytes: Long = 0
-        if (cursor.moveToFirst()) {
-            val bytesDownloadedIndex = cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
-            downloadedBytes = cursor.getLong(bytesDownloadedIndex)
-        }
-        cursor.close()
-        return downloadedBytes
-    }
 }

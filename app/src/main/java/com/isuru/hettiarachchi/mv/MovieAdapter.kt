@@ -48,7 +48,7 @@ class MovieAdapter(private val movies: List<Movie>,private val context: Context)
         val minutes = runtimeInMinutes % 60
         val runtimeString = "${hours}h ${minutes}min"
         holder.movieRuntime.text = runtimeString
-        holder.movieGenres.text = movie.genres.joinToString(", ")
+        holder.movieGenres.text = movie.genres?.joinToString(", ")
         holder.movieSummary.text = movie.summary
 
         val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

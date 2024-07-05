@@ -71,6 +71,8 @@ dependencies {
     // Glide for image loading
     implementation ("com.github.bumptech.glide:glide:4.16.0")
 
+    implementation("androidx.work:work-runtime-ktx:2.10.0-alpha02")
+
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))

@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -32,11 +34,9 @@ class DownloadActivity : ComponentActivity() {
 
         scheduleClearCacheWorker()
 
-
         setContentView(R.layout.download_movie)
 
         checkPermissions()
-
 
         webView = findViewById(R.id.webView)
         webView.webViewClient = WebViewClient()
@@ -52,27 +52,52 @@ class DownloadActivity : ComponentActivity() {
             val cookies = android.webkit.CookieManager.getInstance().getCookie(url)
             request.addRequestHeader("cookie", cookies)
             request.addRequestHeader("User-Agent", userAgent)
-            request.setDescription("Downloading file...")
-            request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
+            val fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+            request.setDescription("Downloading file...(Size:${contentLength / (1024 * 1024)}MB)")
+            request.setTitle(fileName)
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
             request.setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,
-                URLUtil.guessFileName(url, contentDisposition, mimetype)
+                fileName
             )
 
             val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            downloadManager.enqueue(request)
+            val downloadId = downloadManager.enqueue(request)
 
             Toast.makeText(applicationContext, "Downloading File...", Toast.LENGTH_LONG).show()
 
+            // Track download progress
+            val handler = Handler(Looper.getMainLooper())
+            handler.post(object : Runnable {
+                override fun run() {
+                    val query = DownloadManager.Query().setFilterById(downloadId)
+                    val cursor = downloadManager.query(query)
+                    if (cursor != null && cursor.moveToFirst()) {
+                        val bytesDownloaded =
+                            cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                        val bytesTotal =
+                            cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
 
+                        if (bytesTotal > 0) {
+                            val progress = (bytesDownloaded * 100L / bytesTotal).toInt()
+                            // Update your UI with the progress here
+                            Toast.makeText(applicationContext, "Downloaded $progress%", Toast.LENGTH_SHORT).show()
+                        }
+
+                        if (cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                            // Download is complete
+                            Toast.makeText(applicationContext, "Download Complete", Toast.LENGTH_LONG).show()
+                            cursor.close()
+                            return
+                        }
+                        cursor.close()
+                    }
+
+                    handler.postDelayed(this, 1000)
+                }
+            })
         }
     }
-
-
-
-
-
 
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(
@@ -98,5 +123,4 @@ class DownloadActivity : ComponentActivity() {
             clearCacheWorkRequest
         )
     }
-
 }

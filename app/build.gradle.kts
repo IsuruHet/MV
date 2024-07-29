@@ -53,25 +53,26 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
 
-    implementation("com.google.android.material:material:1.13.0-alpha03")
+    implementation(libs.material)
 
     //Retrofit for networking
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation (libs.retrofit)
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
 
     // Coroutine support
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android")
+    implementation (libs.kotlinx.coroutines.android)
 
 
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation(libs.androidx.recyclerview)
 
     // For control over item selection of both touch and mouse driven selection
-    implementation("androidx.recyclerview:recyclerview-selection:1.1.0")
+    implementation(libs.androidx.recyclerview.selection)
 
     // Glide for image loading
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation (libs.glide)
 
-    implementation("androidx.work:work-runtime-ktx:2.10.0-alpha02")
+    implementation(libs.androidx.work.runtime.ktx)
+
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
